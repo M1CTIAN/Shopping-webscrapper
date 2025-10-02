@@ -18,6 +18,7 @@ class ProductResponse(BaseModel):
     status: str
 
 class Product(BaseModel):
+    id: int  # Unique numeric ID for routing
     product_id: str
     original_url: str
     clean_url: str
@@ -31,6 +32,12 @@ class PriceHistory(BaseModel):
     product_id: str
     price: str
     timestamp: str
+
+class PriceHistoryEntry(BaseModel):
+    price: str
+    timestamp: str
+    change_type: Optional[str] = None
+    previous_price: Optional[str] = None
 
 class ProductsResponse(BaseModel):
     products: List[Product]
@@ -47,3 +54,18 @@ class HealthResponse(BaseModel):
 
 class DeleteResponse(BaseModel):
     message: str
+
+class ProductDetailResponse(BaseModel):
+    id: int
+    product_id: str
+    original_url: str
+    clean_url: str
+    added_at: str
+    last_updated: str
+    current_price: str
+    product_name: Optional[str] = None
+    image_url: Optional[str] = None
+    price_history: List[PriceHistoryEntry]
+    total_checks: int
+    price_changes: int
+    stats: Optional[dict] = None

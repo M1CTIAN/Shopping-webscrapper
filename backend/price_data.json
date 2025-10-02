@@ -1,22 +1,63 @@
 {
   "products": [
     {
-      "product_id": "amazon_B0CHX1W1XY",
-      "original_url": "https://www.amazon.in/Apple-iPhone-15-128-GB/dp/B0CHX1W1XY/ref=lp_1389401031_1_1?pf_rd_p=9e034799-55e2-4ab2-b0d0-eb42f95b2d05&pf_rd_r=QTCS64Q7J34MYAB6AZW4&sbo=RZvfv%2F%2FHxDF%2BO5021pAnSA%3D%3D&th=1",
-      "clean_url": "https://www.amazon.in/dp/B0CHX1W1XY",
-      "added_at": "2025-09-30T19:40:34.660671",
-      "last_updated": "2025-09-30T19:40:34.660671",
-      "current_price": "47,999.",
-      "product_name": "Apple iPhone 15 (128 GB) - Black",
-      "image_url": "https://m.media-amazon.com/images/I/31KxpX7Xk7L._SY300_SX300_QL70_FMwebp_.jpg",
+      "id": 1,
+      "product_id": "amazon_B0BX52C4LN",
+      "original_url": "https://www.amazon.in/dp/B0BX52C4LN?th=1",
+      "clean_url": "https://www.amazon.in/dp/B0BX52C4LN",
+      "added_at": "2025-10-02T17:41:17.519389",
+      "last_updated": "2025-10-02T17:51:53.825043",
+      "current_price": "3,849.",
+      "product_name": "HyperX Pulsefire Haste 2 Wireless Gaming Mouse Ultra Lightweight, 61g, 100 Hour Battery Life, 2.4Ghz",
+      "image_url": "https://m.media-amazon.com/images/I/310wAHIQkbL._SY300_SX300_QL70_FMwebp_.jpg",
       "price_history": [
         {
-          "price": "47,999.",
-          "timestamp": "2025-09-30T19:40:34.660671",
+          "price": "3,849.",
+          "timestamp": "2025-10-02T17:41:17.519389",
           "change_type": "initial"
         }
       ],
-      "total_price_checks": 1,
+      "total_price_checks": 2,
+      "price_changes": 0
+    },
+    {
+      "id": 2,
+      "product_id": "amazon_B0BX51KBL9",
+      "original_url": "https://www.amazon.in/HyperX-Pulsefire-Wireless-Lightweight-Battery/dp/B0BX51KBL9?source=ps-sl-shoppingads-lpcontext&ref_=fplfs&smid=AJ6SIZC8YQDZX&th=1",
+      "clean_url": "https://www.amazon.in/dp/B0BX51KBL9",
+      "added_at": "2025-10-02T17:42:01.606274",
+      "last_updated": "2025-10-02T17:51:57.455973",
+      "current_price": "3,749.",
+      "product_name": "HyperX Pulsefire Haste 2 Wireless Gaming Mouse Ultra Lightweight, 61g, 100 Hour Battery Life, 2.4Ghz",
+      "image_url": "https://m.media-amazon.com/images/I/217NaL+XBwL._SY300_SX300_QL70_FMwebp_.jpg",
+      "price_history": [
+        {
+          "price": "3,749.",
+          "timestamp": "2025-10-02T17:42:01.606274",
+          "change_type": "initial"
+        }
+      ],
+      "total_price_checks": 2,
+      "price_changes": 0
+    },
+    {
+      "id": 3,
+      "product_id": "amazon_B0DSLG3HBG",
+      "original_url": "https://www.amazon.in/ASUS-i7-13650HX-4050-6GB-Windows-G614JU-N4200WS/dp/B0DSLG3HBG/ref=sr_1_26?crid=G83BT0018WN3&dib=eyJ2IjoiMSJ9.d9DGhsZt0OWw_xyRTQUJdXaehsEgmKHfwfrFeKbFkfU.VkjAsZcW_xMcDQ94VnIoGwuXWzGkJ1js-A_CANV65oA&dib_tag=se&keywords=gaming+laptop&qid=1759407266&s=electronics&sprefix=gaming+laptop+%2Celectronics%2C261&sr=1-26&xpid=m8WlJCsyV4dnt",
+      "clean_url": "https://www.amazon.in/dp/B0DSLG3HBG",
+      "added_at": "2025-10-02T17:44:45.702829",
+      "last_updated": "2025-10-02T17:52:00.953390",
+      "current_price": "1,13,290.",
+      "product_name": "ASUS ROG Strix G16 13th Gen,Intel Core i7-13650HX Gaming Laptop(NVIDIA RTX 4050-6GB/140W TGP/16GB/1T",
+      "image_url": "https://m.media-amazon.com/images/I/41ZmSp8vn-L._SY300_SX300_QL70_FMwebp_.jpg",
+      "price_history": [
+        {
+          "price": "1,13,290.",
+          "timestamp": "2025-10-02T17:44:45.702829",
+          "change_type": "initial"
+        }
+      ],
+      "total_price_checks": 2,
       "price_changes": 0
     }
   ],

@@ -12,14 +12,38 @@ from config.settings import DATA_FILE
 
 class DatabaseService:
     """Handle all database operations"""
+    
+    @staticmethod
+    def get_next_id(data: Dict[str, List[Any]]) -> int:
+        """Generate next unique ID for products"""
+        if not data["products"]:
+            return 1
+        existing_ids = [p.get("id", 0) for p in data["products"]]
+        return max(existing_ids) + 1 if existing_ids else 1
 
     @staticmethod
     def load_data() -> Dict[str, List[Any]]:
-        """Load existing data from JSON file"""
+        """Load existing data from JSON file and migrate if needed"""
         if os.path.exists(DATA_FILE):
             try:
                 with open(DATA_FILE, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    
+                # Migrate products that don't have unique ID
+                needs_migration = False
+                next_id = 1
+                
+                for product in data.get("products", []):
+                    if "id" not in product:
+                        product["id"] = next_id
+                        next_id += 1
+                        needs_migration = True
+                
+                # Save migrated data
+                if needs_migration:
+                    DatabaseService.save_data(data)
+                    
+                return data
             except (json.JSONDecodeError, FileNotFoundError):
                 pass
         return {"products": [], "price_history": []}
@@ -48,11 +72,13 @@ class DatabaseService:
     @staticmethod
     def create_product_entry(
         product_id: str, url: str, clean_url: str, current_price: str, 
-        product_name: str = None, image_url: str = None
+        product_name: str = None, image_url: str = None, data: Dict[str, List[Any]] = None
     ) -> Dict[str, Any]:
         """Create new product entry with price history array (includes name and image)"""
         timestamp = datetime.now().isoformat()
+        unique_id = DatabaseService.get_next_id(data) if data else 1
         return {
+            "id": unique_id,
             "product_id": product_id,
             "original_url": url,
             "clean_url": clean_url,
@@ -200,6 +226,16 @@ class DatabaseService:
                 
                 return stats
         
+        return None
+    
+    @staticmethod
+    def get_product_by_id(product_unique_id: int) -> Optional[Dict[str, Any]]:
+        """Get a single product by its unique ID"""
+        data = DatabaseService.load_data()
+        
+        for product in data["products"]:
+            if product.get("id") == product_unique_id:
+                return product
         return None
     
     @staticmethod

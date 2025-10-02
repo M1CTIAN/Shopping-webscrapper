@@ -317,5 +317,10 @@ class PriceScraper:
                 return matches[0]
         return None
 
+    def close(self):
+        """Close the session"""
+        if hasattr(self, 'session'):
+            self.session.close()
+
 # Global scraper instance
 scraper = PriceScraper()
