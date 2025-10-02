@@ -58,8 +58,6 @@ npm run dev
 - ✅ **Flipkart** - Full support with images and product names
 - ❌ **Myntra** - Currently not supported (too many anti-bot measures)
 
-## 📸 Screenshots
-
 ### Homepage
 Clean interface for adding new products to track
 
