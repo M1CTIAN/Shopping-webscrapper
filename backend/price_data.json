@@ -1,0 +1,24 @@
+{
+  "products": [
+    {
+      "product_id": "amazon_B0CHX1W1XY",
+      "original_url": "https://www.amazon.in/Apple-iPhone-15-128-GB/dp/B0CHX1W1XY/ref=lp_1389401031_1_1?pf_rd_p=9e034799-55e2-4ab2-b0d0-eb42f95b2d05&pf_rd_r=QTCS64Q7J34MYAB6AZW4&sbo=RZvfv%2F%2FHxDF%2BO5021pAnSA%3D%3D&th=1",
+      "clean_url": "https://www.amazon.in/dp/B0CHX1W1XY",
+      "added_at": "2025-09-30T19:40:34.660671",
+      "last_updated": "2025-09-30T19:40:34.660671",
+      "current_price": "47,999.",
+      "product_name": "Apple iPhone 15 (128 GB) - Black",
+      "image_url": "https://m.media-amazon.com/images/I/31KxpX7Xk7L._SY300_SX300_QL70_FMwebp_.jpg",
+      "price_history": [
+        {
+          "price": "47,999.",
+          "timestamp": "2025-09-30T19:40:34.660671",
+          "change_type": "initial"
+        }
+      ],
+      "total_price_checks": 1,
+      "price_changes": 0
+    }
+  ],
+  "price_history": []
+}
