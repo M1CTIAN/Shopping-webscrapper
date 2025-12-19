@@ -40,31 +40,21 @@ class PriceTrackingScheduler:
             logger.warning("Scheduler is already running")
             return
             
-        logger.info("🚀 Starting Price Tracking Scheduler")
+        logger.info("Starting Price Tracking Scheduler")
         
-        # Schedule different tracking frequencies
-        # High priority products: every 2 hours
+        # Schedule daily update for all products at 5:30 AM
         self.scheduler.add_job(
-            func=self.track_high_priority_products,
-            trigger=IntervalTrigger(hours=2),
-            id='high_priority_tracking',
-            name='High Priority Products - Every 2 hours',
+            func=self.track_all_products,
+            trigger=CronTrigger(hour=5, minute=30),
+            id='daily_tracking',
+            name='Daily Product Update - 5:30 AM',
             replace_existing=True
         )
         
-        # Regular products: every 6 hours
-        self.scheduler.add_job(
-            func=self.track_regular_products,
-            trigger=IntervalTrigger(hours=6),
-            id='regular_tracking',
-            name='Regular Products - Every 6 hours',
-            replace_existing=True
-        )
-        
-        # Daily summary and cleanup
+        # Daily summary and cleanup (moved to 6:00 AM to run after updates)
         self.scheduler.add_job(
             func=self.daily_maintenance,
-            trigger=CronTrigger(hour=2, minute=0),  # 2:00 AM daily
+            trigger=CronTrigger(hour=6, minute=0),
             id='daily_maintenance',
             name='Daily Maintenance',
             replace_existing=True
@@ -81,66 +71,44 @@ class PriceTrackingScheduler:
         
         self.scheduler.start()
         self.is_running = True
-        logger.info("✅ Price Tracking Scheduler started successfully")
+        logger.info("Price Tracking Scheduler started successfully")
     
     async def stop_scheduler(self):
         """Stop the scheduler"""
         if self.scheduler.running:
             self.scheduler.shutdown()
             self.is_running = False
-            logger.info("🛑 Price Tracking Scheduler stopped")
+            logger.info("Price Tracking Scheduler stopped")
+
+    def get_status(self) -> Dict[str, Any]:
+        """Get scheduler status"""
+        jobs = []
+        if self.scheduler.running:
+            for job in self.scheduler.get_jobs():
+                jobs.append({
+                    "id": job.id,
+                    "name": job.name,
+                    "next_run": job.next_run_time.isoformat() if job.next_run_time else None
+                })
+        
+        return {
+            "is_running": self.is_running,
+            "jobs_count": len(jobs),
+            "jobs": jobs
+        }
     
-    async def track_high_priority_products(self):
-        """Track high-priority products (frequent price changes or user favorites)"""
-        logger.info("🔥 Starting high-priority product tracking...")
+    async def track_all_products(self):
+        """Track all products daily"""
+        logger.info("Starting daily tracking for all products...")
         
         data = self.db.load_data()
-        high_priority_products = []
+        all_products = data.get("products", [])
         
-        # Identify high priority products
-        for product in data.get("products", []):
-            # Products with recent price changes or high volatility
-            price_changes = product.get("price_changes", 0)
-            total_checks = product.get("total_price_checks", 1)
-            
-            # Mark as high priority if:
-            # 1. High change frequency (>20% of checks resulted in price changes)
-            # 2. Recently added (less than 7 days old)
-            # 3. Manually marked as favorite (we can add this later)
-            change_rate = price_changes / total_checks
-            
-            added_date = datetime.fromisoformat(product.get("added_at", ""))
-            days_old = (datetime.now() - added_date).days
-            
-            if change_rate > 0.2 or days_old < 7:
-                high_priority_products.append(product)
-        
-        await self._track_products_batch(high_priority_products, "High Priority")
-    
-    async def track_regular_products(self):
-        """Track regular products"""
-        logger.info("📊 Starting regular product tracking...")
-        
-        data = self.db.load_data()
-        regular_products = []
-        
-        for product in data.get("products", []):
-            price_changes = product.get("price_changes", 0)
-            total_checks = product.get("total_price_checks", 1)
-            change_rate = price_changes / total_checks
-            
-            added_date = datetime.fromisoformat(product.get("added_at", ""))
-            days_old = (datetime.now() - added_date).days
-            
-            # Regular products (not high priority)
-            if change_rate <= 0.2 and days_old >= 7:
-                regular_products.append(product)
-        
-        await self._track_products_batch(regular_products, "Regular")
+        await self._track_products_batch(all_products, "Daily Update")
     
     async def weekly_full_scan(self):
         """Comprehensive weekly scan of all products"""
-        logger.info("🔍 Starting weekly full scan...")
+        logger.info("Starting weekly full scan...")
         
         data = self.db.load_data()
         all_products = data.get("products", [])
@@ -152,7 +120,7 @@ class PriceTrackingScheduler:
     
     async def daily_maintenance(self):
         """Daily maintenance tasks"""
-        logger.info("🧹 Starting daily maintenance...")
+        logger.info("Starting daily maintenance...")
         
         # Clean up old log files
         # Backup data
@@ -168,7 +136,7 @@ class PriceTrackingScheduler:
             "active_products": len([p for p in products if self._is_recently_updated(p)])
         }
         
-        logger.info(f"📈 Daily Summary: {json.dumps(summary, indent=2)}")
+        logger.info(f"Daily Summary: {json.dumps(summary, indent=2)}")
     
     async def _track_products_batch(self, products: List[Dict], batch_name: str):
         """Track a batch of products with error handling and rate limiting"""
@@ -176,7 +144,7 @@ class PriceTrackingScheduler:
             logger.info(f"No products to track for {batch_name}")
             return
         
-        logger.info(f"📦 Tracking {len(products)} products for {batch_name}")
+        logger.info(f"Tracking {len(products)} products for {batch_name}")
         
         successful_updates = 0
         failed_updates = 0
@@ -194,10 +162,10 @@ class PriceTrackingScheduler:
                     failed_updates += 1
                     
             except Exception as e:
-                logger.error(f"❌ Error tracking product {product.get('product_id', 'unknown')}: {str(e)}")
+                logger.error(f"Error tracking product {product.get('product_id', 'unknown')}: {str(e)}")
                 failed_updates += 1
         
-        logger.info(f"✅ {batch_name} completed: {successful_updates} successful, {failed_updates} failed")
+        logger.info(f"{batch_name} completed: {successful_updates} successful, {failed_updates} failed")
     
     async def _update_single_product_price(self, product: Dict) -> bool:
         """Update price for a single product"""
@@ -238,9 +206,9 @@ class PriceTrackingScheduler:
                     
                     # Log price change if it occurred
                     if update_result["status"] == "price_changed":
-                        logger.info(f"💰 Price change detected for {product_id}: {old_price} → {new_price}")
+                        logger.info(f"Price change detected for {product_id}: {old_price} -> {new_price}")
                     else:
-                        logger.debug(f"📊 Price check completed for {product_id}: {new_price} (no change)")
+                        logger.debug(f"Price check completed for {product_id}: {new_price} (no change)")
                     
                     return True
             
@@ -302,7 +270,7 @@ class PriceTrackingScheduler:
         volatile_products.sort(key=lambda x: x["volatility"], reverse=True)
         report["top_volatile_products"] = volatile_products[:5]
         
-        logger.info(f"📑 Weekly Report Generated: {json.dumps(report, indent=2, default=str)}")
+        logger.info(f"Weekly Report Generated: {json.dumps(report, indent=2, default=str)}")
         
         # Save report to file
         with open(f"weekly_report_{datetime.now().strftime('%Y%m%d')}.json", "w") as f:

@@ -12,7 +12,7 @@ lxml==4.9.3
 pydantic==2.5.0
 
 # CORS middleware
-python-cors==1.7.0
+# python-cors==1.7.0
 
 # Scheduling and background tasks
 APScheduler==3.10.4

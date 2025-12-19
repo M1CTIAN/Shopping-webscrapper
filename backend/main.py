@@ -16,6 +16,7 @@ from services.scraper import scraper
 from services.database import DatabaseService
 from services.url_processor import extract_product_id, get_clean_url
 from services.manual_tracker import manual_tracker
+from services.price_scheduler import PriceTrackingScheduler
 
 # Import configuration
 from config.settings import API_TITLE, API_DESCRIPTION, API_VERSION
@@ -38,8 +39,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize database service
+# Initialize services
 db = DatabaseService()
+scheduler = PriceTrackingScheduler()
 
 # ===============================
 # API ENDPOINTS
@@ -237,11 +239,11 @@ def update_stale_products(hours: int = 24):
 @app.get("/track/status", tags=["Price Tracking"])
 def get_tracking_status():
     """Get current tracking status and statistics"""
+    # Get scheduler status
+    scheduler_status = scheduler.get_status()
+    
     data = db.load_data()
     products = data.get("products", [])
-    
-    if not products:
-        return {"message": "No products being tracked"}
     
     # Calculate statistics
     total_products = len(products)
@@ -259,6 +261,7 @@ def get_tracking_status():
             pass
     
     return {
+        "scheduler": scheduler_status,
         "tracking_statistics": {
             "total_products": total_products,
             "total_price_checks": total_checks,
@@ -276,13 +279,19 @@ def get_tracking_status():
 # ===============================
 @app.on_event("startup")
 async def startup_event():
-    print("🚀 Price Tracker API is starting up!")
-    print(f"📊 Visit http://127.0.0.1:8000/docs for interactive documentation")
+    print("Price Tracker API is starting up!")
+    print(f"Visit http://127.0.0.1:8000/docs for interactive documentation")
+    
+    # Start the price tracking scheduler
+    await scheduler.start_scheduler()
 
 @app.on_event("shutdown")
 async def shutdown_event():
+    # Stop the scheduler
+    await scheduler.stop_scheduler()
+    
     scraper.close()
-    print("🛑 Price Tracker API is shutting down!")
+    print("Price Tracker API is shutting down!")
 
 if __name__ == "__main__":
     import uvicorn
