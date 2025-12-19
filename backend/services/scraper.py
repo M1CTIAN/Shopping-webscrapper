@@ -4,6 +4,7 @@ Web scraping functionality for different e-commerce sites
 import requests
 from bs4 import BeautifulSoup
 import re
+import json
 from typing import Optional, Dict, Any
 from config.settings import SCRAPING_HEADERS, REQUEST_TIMEOUT, AMAZON_PRICE_SELECTORS, PRICE_PATTERNS
 
@@ -108,9 +109,30 @@ class PriceScraper:
         for selector in image_selectors:
             img_elem = soup.select_one(selector)
             if img_elem:
-                img_src = img_elem.get('src') or img_elem.get('data-old-hires') or img_elem.get('data-src')
+                # 1. Try data-old-hires (often high res)
+                if img_elem.get('data-old-hires'):
+                    result['image_url'] = img_elem.get('data-old-hires')
+                    break
+                
+                # 2. Try data-a-dynamic-image (JSON with multiple sizes)
+                if img_elem.get('data-a-dynamic-image'):
+                    try:
+                        images = json.loads(img_elem.get('data-a-dynamic-image'))
+                        if images:
+                            # Sort by width (index 0 of value list)
+                            sorted_images = sorted(images.items(), key=lambda x: x[1][0], reverse=True)
+                            result['image_url'] = sorted_images[0][0]
+                            break
+                    except:
+                        pass
+
+                # 3. Fallback to src and try to clean it
+                img_src = img_elem.get('src') or img_elem.get('data-src')
                 if img_src and 'http' in img_src:
-                    result['image_url'] = img_src
+                    # Remove resolution modifiers like ._SY300_SX300_ to get full size
+                    # Pattern: ._XY123_.jpg or ._XY123_XY123_.jpg
+                    clean_src = re.sub(r'\._[A-Z]{2}\d+(?:_[A-Z]{2}\d+)?_?\.jpg$', '.jpg', img_src)
+                    result['image_url'] = clean_src
                     break
         
         return result
@@ -125,6 +147,8 @@ class PriceScraper:
         
         # Price extraction
         flipkart_price_selectors = [
+            '.Nx9bqj.CllCnN',  # New common selector
+            '.hZ3P6w.bnqy13',  # Found in debug
             '._30jeq3._16Jk6d',
             '._1_WHN1',
             '._3I9_wc._2p6lqe',
@@ -139,6 +163,8 @@ class PriceScraper:
         
         # Name extraction
         name_selectors = [
+            '.CEn5rD',         # Found in debug
+            '.VU-ZEz',         # New common selector
             '.B_NuCI',
             '._35KyD6',
             '.x2Jym8._35HD7C',
@@ -153,6 +179,12 @@ class PriceScraper:
         
         # Image extraction
         image_selectors = [
+            'div.lWX0_T img',  # Main image container (New)
+            'img.UCc1lI',      # Main image class (New)
+            'img.EIfF82',      # Found in debug (Thumbnail - reliable)
+            'img.MZeksS',      # Found in debug (Main image - moved down due to false positives)
+            'img.I5YBTD',      # Found in debug
+            '.DByuf4 img',     # New common selector
             '._396cs4._2amPTt._3qGmMb img',
             '._2r_T1I img',
             '.CXW8mj img',
@@ -164,7 +196,10 @@ class PriceScraper:
             if img_elem:
                 img_src = img_elem.get('src') or img_elem.get('data-src')
                 if img_src and 'http' in img_src:
-                    result['image_url'] = img_src
+                    # Flipkart images often have /image/128/128/ in the path
+                    # We can replace it with /image/832/832/ for higher resolution
+                    high_res_src = re.sub(r'/image/\d+/\d+/', '/image/832/832/', img_src)
+                    result['image_url'] = high_res_src
                     break
         
         return result
@@ -176,6 +211,58 @@ class PriceScraper:
             'name': 'Product',
             'image_url': None
         }
+
+        # 1. Try extracting from JSON data in script tags (Most reliable for Myntra)
+        try:
+            scripts = soup.find_all('script')
+            for script in scripts:
+                if script.string and 'pdpData' in script.string:
+                    # Look for window.__myx = { ... } or similar structure
+                    # We'll try to extract the JSON object containing pdpData
+                    
+                    # Regex to find the JSON object starting with {"pdpData":
+                    # This is a bit loose but often works for embedded JSON
+                    # Updated regex to be greedy and handle missing semicolon
+                    json_match = re.search(r'window\.__myx\s*=\s*({.*})', script.string)
+                    if json_match:
+                        data_str = json_match.group(1)
+                        if data_str.endswith(';'):
+                            data_str = data_str[:-1]
+                        
+                        data = json.loads(data_str)
+                        
+                        if 'pdpData' in data:
+                            pdp_data = data['pdpData']
+                            
+                            # Name
+                            if 'name' in pdp_data:
+                                result['name'] = pdp_data['name']
+                            
+                            # Price
+                            if 'price' in pdp_data:
+                                price_info = pdp_data['price']
+                                if isinstance(price_info, dict):
+                                    result['price'] = str(price_info.get('discounted', price_info.get('mrp', '')))
+                                else:
+                                    result['price'] = str(price_info)
+                            elif 'mrp' in pdp_data:
+                                result['price'] = str(pdp_data['mrp'])
+                            
+                            # Image
+                            if 'media' in pdp_data and 'albums' in pdp_data['media']:
+                                albums = pdp_data['media']['albums']
+                                if albums and len(albums) > 0:
+                                    images = albums[0].get('images', [])
+                                    if images and len(images) > 0:
+                                        # Prefer imageURL which is clean, fallback to src
+                                        result['image_url'] = images[0].get('imageURL') or images[0].get('src')
+                                        # If we found everything, return immediately
+                                        if result['image_url'] and result['name'] != 'Product':
+                                            return result
+        except Exception as e:
+            print(f"Error extracting Myntra JSON: {e}")
+
+        # 2. Fallback to HTML scraping
         
         # Price extraction
         myntra_price_selectors = [
@@ -252,6 +339,27 @@ class PriceScraper:
                         result['image_url'] = img_src
                         break
         
+        # 3. Check for background-image in div (common in Myntra)
+        if not result['image_url']:
+            # Try specific classes first, then all divs with style attribute
+            divs_to_check = soup.select('.image-grid-image') + soup.select('.image-grid-imageContainer div')
+            
+            # If specific classes fail, check ALL divs with style attribute (aggressive fallback)
+            if not divs_to_check:
+                divs_to_check = soup.find_all('div', style=True)
+
+            for div_elem in divs_to_check:
+                style = div_elem.get('style', '')
+                if 'background-image' in style and 'myntassets.com' in style:
+                    # Extract URL from background-image: url("...")
+                    match = re.search(r'url\([\'"]?(https?://[^)]+)[\'"]?\)', style)
+                    if match:
+                        img_url = match.group(1)
+                        # Verify it's a product image (usually has h_, w_, q_ params or similar)
+                        if 'assets.myntassets.com' in img_url:
+                             result['image_url'] = img_url
+                             break
+
         # If no image found, try to find any high-quality image on the page
         if not result['image_url']:
             all_images = soup.find_all('img')
@@ -259,7 +367,8 @@ class PriceScraper:
                 img_src = img.get('src') or img.get('data-src')
                 if (img_src and 
                     'myntassets.com' in img_src and 
-                    any(size in img_src for size in ['1080', '1440', '2160', 'large']) and
+                    # Relaxed size check to include 720p and other common sizes
+                    any(size in img_src for size in ['720', '1080', '1440', '2160', 'large', 'h_']) and
                     not any(skip in img_src.lower() for skip in ['placeholder', 'loading', 'thumbnail'])):
                     if img_src.startswith('//'):
                         img_src = 'https:' + img_src

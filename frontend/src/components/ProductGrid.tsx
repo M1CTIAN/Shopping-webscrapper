@@ -18,19 +18,21 @@ export default function ProductGrid({ products, loading, onImageError }: Product
     return (
       <div className="mb-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i} className="bg-slate-800 rounded-xl shadow-lg overflow-hidden animate-pulse">
-              <div className="h-48 bg-slate-700"></div>
-              <div className="p-5">
-                <div className="h-6 bg-slate-700 rounded mb-2"></div>
-                <div className="h-4 bg-slate-700 rounded w-3/4 mb-4"></div>
-                <div className="flex justify-between items-center mb-4">
-                  <div className="h-8 bg-slate-700 rounded w-20"></div>
-                  <div className="h-4 bg-slate-700 rounded w-16"></div>
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl overflow-hidden">
+              <div className="aspect-[4/3] bg-slate-800/50 animate-pulse"></div>
+              <div className="p-5 space-y-4">
+                <div className="flex justify-between items-start">
+                  <div className="h-4 bg-slate-800 rounded w-20 animate-pulse"></div>
+                  <div className="h-6 bg-slate-800 rounded-full w-16 animate-pulse"></div>
                 </div>
-                <div className="flex space-x-3">
-                  <div className="flex-1 h-10 bg-slate-700 rounded"></div>
-                  <div className="h-10 w-12 bg-slate-700 rounded"></div>
+                <div className="space-y-2">
+                  <div className="h-6 bg-slate-800 rounded w-full animate-pulse"></div>
+                  <div className="h-6 bg-slate-800 rounded w-2/3 animate-pulse"></div>
+                </div>
+                <div className="flex justify-between items-end pt-2">
+                  <div className="h-8 bg-slate-800 rounded w-24 animate-pulse"></div>
+                  <div className="h-8 bg-slate-800 rounded w-8 animate-pulse"></div>
                 </div>
               </div>
             </div>
@@ -42,14 +44,14 @@ export default function ProductGrid({ products, loading, onImageError }: Product
 
   if (products.length === 0) {
     return (
-      <div className="bg-slate-800 rounded-xl shadow-lg p-12 mb-12 text-center">
-        <div className="text-slate-500 mb-6">
-          <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-12 mb-12 text-center">
+        <div className="text-slate-600 mb-6">
+          <svg className="mx-auto h-20 w-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
           </svg>
         </div>
-        <h3 className="text-2xl font-semibold text-white mb-3">No products tracked yet</h3>
-        <p className="text-slate-400 text-lg">Start by adding your first product!</p>
+        <h3 className="text-2xl font-bold text-white mb-3">No products tracked yet</h3>
+        <p className="text-slate-400 text-lg max-w-md mx-auto">Start tracking prices by adding your first product URL above.</p>
       </div>
     )
   }
@@ -75,14 +77,14 @@ export default function ProductGrid({ products, loading, onImageError }: Product
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-center mt-8 space-x-2">
+        <div className="flex justify-center mt-12 gap-2">
           <button
             onClick={() => paginate(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-lg ${
+            className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
               currentPage === 1
-                ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-                : 'bg-slate-700 text-white hover:bg-slate-600'
+                ? 'bg-slate-800/50 text-slate-600 cursor-not-allowed'
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white hover:shadow-lg hover:shadow-blue-900/20'
             }`}
           >
             Previous
@@ -92,10 +94,10 @@ export default function ProductGrid({ products, loading, onImageError }: Product
             <button
               key={i + 1}
               onClick={() => paginate(i + 1)}
-              className={`px-4 py-2 rounded-lg ${
+              className={`w-10 h-10 rounded-xl font-medium transition-all duration-200 ${
                 currentPage === i + 1
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-700 text-white hover:bg-slate-600'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20 scale-110'
+                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
               }`}
             >
               {i + 1}
@@ -105,10 +107,10 @@ export default function ProductGrid({ products, loading, onImageError }: Product
           <button
             onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-lg ${
+            className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
               currentPage === totalPages
-                ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-                : 'bg-slate-700 text-white hover:bg-slate-600'
+                ? 'bg-slate-800/50 text-slate-600 cursor-not-allowed'
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white hover:shadow-lg hover:shadow-blue-900/20'
             }`}
           >
             Next

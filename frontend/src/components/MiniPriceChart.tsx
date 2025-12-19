@@ -16,8 +16,9 @@ interface MiniPriceChartProps {
 export default function MiniPriceChart({ priceHistory, className = '' }: MiniPriceChartProps) {
   if (!priceHistory || priceHistory.length < 2) {
     return (
+      // FIX 1: Removed weird characters, fixed 'lex' to 'flex', and added backticks
       <div className={`flex items-center justify-center ${className}`}>
-        <div className="text-xs text-gray-400">No trend data</div>
+        <div className='text-xs text-slate-500'>No trend data</div>
       </div>
     )
   }
@@ -31,8 +32,9 @@ export default function MiniPriceChart({ priceHistory, className = '' }: MiniPri
 
   if (chartData.length < 2) {
     return (
+      // FIX 2: Same fix here - added backticks and fixed 'flex'
       <div className={`flex items-center justify-center ${className}`}>
-        <div className="text-xs text-gray-400">Insufficient data</div>
+        <div className='text-xs text-slate-500'>Insufficient data</div>
       </div>
     )
   }
@@ -41,19 +43,20 @@ export default function MiniPriceChart({ priceHistory, className = '' }: MiniPri
   const firstPrice = chartData[0].price
   const lastPrice = chartData[chartData.length - 1].price
   const isDecreasing = lastPrice < firstPrice
-  const lineColor = isDecreasing ? '#10B981' : '#EF4444' // green for decrease (good), red for increase
+  const lineColor = isDecreasing ? '#10B981' : '#F43F5E' // emerald-500 for decrease (good), rose-500 for increase
 
   return (
-    <div className={`${className}`}>
-      <ResponsiveContainer width="100%" height="100%">
+    // FIX 3: Fixed invalid syntax {${className}} -> {className}
+    <div className={className}>
+      <ResponsiveContainer width='100%' height='100%'>
         <LineChart data={chartData}>
           <Line 
-            type="monotone" 
-            dataKey="price" 
-            stroke={lineColor}
-            strokeWidth={2}
+            type='monotone' 
+            dataKey='price' 
+            stroke={lineColor} 
+            strokeWidth={2} 
             dot={false}
-            activeDot={false}
+            isAnimationActive={false}
           />
         </LineChart>
       </ResponsiveContainer>

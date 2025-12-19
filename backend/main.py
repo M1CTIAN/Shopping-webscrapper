@@ -14,7 +14,7 @@ from models.schemas import (
 # Import services
 from services.scraper import scraper
 from services.database import DatabaseService
-from services.url_processor import extract_product_id, get_clean_url
+from services.url_processor import extract_product_id, get_clean_url, detect_website
 from services.manual_tracker import manual_tracker
 from services.price_scheduler import PriceTrackingScheduler
 
@@ -65,6 +65,12 @@ def add_product_tracking(product: ProductURL):
     # Extract product information
     product_id = extract_product_id(str(product.url))
     clean_url = get_clean_url(str(product.url))
+
+    # Validate that the URL corresponds to a supported e-commerce product
+    website = detect_website(str(product.url))
+    allowed_prefixes = ('amazon_', 'flipkart_', 'myntra_')
+    if not any(product_id.startswith(p) for p in allowed_prefixes):
+        raise HTTPException(status_code=400, detail="Unsupported or non-product URL. Provide a valid product link from a supported site.")
     
     # Scrape product data (price, name, image)
     product_data = scraper.scrape_product_data(str(product.url))

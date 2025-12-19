@@ -1,16 +1,23 @@
+// types/product.ts
+
 export interface Product {
-  id: number  // Unique numeric ID for routing
-  product_id: string
-  original_url: string
-  clean_url: string
-  current_price: string
-  added_at: string
-  last_updated: string
-  total_checks?: number
-  price_changes?: number
-  product_name?: string
-  image_url?: string
-  price_history?: PriceHistoryEntry[]  // Optional for regular product list
+  id: number;
+  product_id: string;
+  original_url: string;
+  clean_url: string;
+  current_price: string; 
+  
+  added_at: string;
+  last_updated: string;
+  total_checks?: number;
+  price_changes?: number;
+
+  product_name?: string; 
+  
+  website?: string;
+
+  image_url?: string;
+  price_history?: any[]; 
 }
 
 export interface PriceHistoryEntry {
