@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Product } from '../types/product'
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://shopping-webscrapper.onrender.com'
+
 export default function SearchBar() {
   const [query, setQuery] = useState('')
   const [products, setProducts] = useState<Product[]>([])
@@ -19,7 +21,7 @@ export default function SearchBar() {
   }, [])
 
   const fetchProducts = () => {
-    fetch('http://localhost:8000/products')
+    fetch(`${API_BASE}/products`)
       .then(res => res.json())
       .then(data => setProducts(data.products))
       .catch(err => console.error('Failed to fetch products for search:', err))
@@ -89,7 +91,7 @@ export default function SearchBar() {
       setUrlError('')
       setIsTracking(true)
       try {
-        const response = await fetch('http://localhost:8000/track-product', {
+        const response = await fetch(`${API_BASE}/track-product`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: query }),

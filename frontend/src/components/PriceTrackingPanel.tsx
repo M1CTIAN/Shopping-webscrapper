@@ -23,6 +23,7 @@ interface StaleProduct {
 }
 
 export default function PriceTrackingPanel() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://shopping-webscrapper.onrender.com'
   const [status, setStatus] = useState<TrackingStatus | null>(null)
   const [staleProducts, setStaleProducts] = useState<StaleProduct[]>([])
   const [loading, setLoading] = useState(false)
@@ -36,7 +37,7 @@ export default function PriceTrackingPanel() {
 
   const fetchTrackingStatus = async () => {
     try {
-      const response = await fetch('http://localhost:8000/track/status')
+      const response = await fetch(`${API_BASE}/track/status`)
       const data = await response.json()
       setStatus(data)
     } catch (error) {
@@ -46,7 +47,7 @@ export default function PriceTrackingPanel() {
 
   const fetchStaleProducts = async () => {
     try {
-      const response = await fetch('http://localhost:8000/track/stale/24')
+      const response = await fetch(`${API_BASE}/track/stale/24`)
       const data = await response.json()
       setStaleProducts(data.stale_products || [])
     } catch (error) {
@@ -57,7 +58,7 @@ export default function PriceTrackingPanel() {
   const updateSingleProduct = async (productId: string) => {
     setUpdating(productId)
     try {
-      const response = await fetch(`http://localhost:8000/track/update/${productId}`, {
+      const response = await fetch(`${API_BASE}/track/update/${productId}`, {
         method: 'POST'
       })
       const data = await response.json()
@@ -80,7 +81,7 @@ export default function PriceTrackingPanel() {
   const updateAllProducts = async () => {
     setLoading(true)
     try {
-      const response = await fetch('http://localhost:8000/track/update-all', {
+      const response = await fetch(`${API_BASE}/track/update-all`, {
         method: 'POST'
       })
       const data = await response.json()
@@ -101,7 +102,7 @@ export default function PriceTrackingPanel() {
   const updateStaleProducts = async () => {
     setLoading(true)
     try {
-      const response = await fetch('http://localhost:8000/track/update-stale/24', {
+      const response = await fetch(`${API_BASE}/track/update-stale/24`, {
         method: 'POST'
       })
       const data = await response.json()

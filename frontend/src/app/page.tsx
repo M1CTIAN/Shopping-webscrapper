@@ -6,6 +6,8 @@ import ProductGrid from '../components/ProductGrid'
 import Sidebar from '../components/Sidebar'
 import { Product } from '../types/product'
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://shopping-webscrapper.onrender.com'
+
 // Helper to parse price string "3,599." -> 3599
 const parsePrice = (priceStr: string) => {
   if (!priceStr) return 0
@@ -75,7 +77,7 @@ export default function Home() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:8000/products')
+      const response = await fetch(`${API_BASE}/products`)
       if (response.ok) {
         const data = await response.json()
         const fetchedProducts = data.products.reverse()

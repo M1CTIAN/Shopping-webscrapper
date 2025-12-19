@@ -4,6 +4,7 @@ Main FastAPI application for Price Tracker API
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
+import os
 
 # Import models
 from models.schemas import (
@@ -286,7 +287,9 @@ def get_tracking_status():
 @app.on_event("startup")
 async def startup_event():
     print("Price Tracker API is starting up!")
-    print(f"Visit http://127.0.0.1:8000/docs for interactive documentation")
+    host = os.environ.get("HOST", "127.0.0.1")
+    port = os.environ.get("PORT", "8000")
+    print(f"Visit http://{host}:{port}/docs for interactive documentation")
     
     # Start the price tracking scheduler
     await scheduler.start_scheduler()
@@ -301,4 +304,6 @@ async def shutdown_event():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    host = os.environ.get("HOST", "0.0.0.0")
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host=host, port=port)

@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ProductDetail } from '../../../types/product'
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://shopping-webscrapper.onrender.com'
 import { formatDate, getProductName, getWebsiteName, getWebsiteColor, getProductImage } from '../../../utils/productUtils'
 import { formatDisplayPrice } from '../../../utils/priceUtils'
 import PriceChart from '../../../components/PriceChart'
@@ -25,7 +27,7 @@ export default function ProductDetailPage() {
     }
     try {
       setLoading(true)
-      const response = await fetch(`http://localhost:8000/product/${productId}`)
+      const response = await fetch(`${API_BASE}/product/${productId}`)
       
       if (!response.ok) {
         throw new Error('Product not found')
