@@ -17,7 +17,7 @@ export interface Product {
   website?: string;
 
   image_url?: string;
-  price_history?: any[]; 
+  price_history?: PriceHistoryEntry[]; 
 }
 
 export interface PriceHistoryEntry {

@@ -1,5 +1,4 @@
 // filepath: c:\Users\Arpit Raj\Desktop\College-stuff\Web Dev\Shopping webscrapper\frontend\src\components\ProductGrid.tsx
-import Link from 'next/link'
 import { useState } from 'react'
 import ProductCard from './ProductCard'
 import { Product } from '../types/product'

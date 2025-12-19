@@ -1,7 +1,7 @@
 'use client'
 
 import { Product } from '../types/product'
-import { formatDate, getProductName, getWebsiteName, getWebsiteColor, getProductImage } from '../utils/productUtils'
+import { getProductName, getWebsiteName, getProductImage } from '../utils/productUtils'
 import { formatDisplayPrice } from '../utils/priceUtils'
 import { useRouter } from 'next/navigation'
 import MiniPriceChart from './MiniPriceChart'

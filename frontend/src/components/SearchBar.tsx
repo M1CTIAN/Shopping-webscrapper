@@ -39,7 +39,7 @@ export default function SearchBar() {
     try {
       new URL(string)
       return true
-    } catch (_) {
+    } catch {
       return false
     }
   }
@@ -96,7 +96,7 @@ export default function SearchBar() {
         })
         
         if (response.ok) {
-          const data = await response.json()
+          await response.json()
           setQuery('')
           setIsOpen(false)
           // Refresh products list
@@ -204,7 +204,7 @@ export default function SearchBar() {
             </div>
           ) : (
             <div className='p-8 text-center text-slate-500'>
-              <p>No products found matching '{query}'</p>
+              <p>No products found matching &quot;{query}&quot;</p>
             </div>
           )}
         </div>

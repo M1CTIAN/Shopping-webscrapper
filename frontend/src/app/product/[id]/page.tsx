@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ProductDetail, PriceHistoryEntry } from '../../../types/product'
+import { ProductDetail } from '../../../types/product'
 import { formatDate, getProductName, getWebsiteName, getWebsiteColor, getProductImage } from '../../../utils/productUtils'
 import { formatDisplayPrice } from '../../../utils/priceUtils'
 import PriceChart from '../../../components/PriceChart'
@@ -17,17 +17,12 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  const fetchProductDetails = useCallback(async () => {
     if (!productId) {
       setError('Invalid product ID')
       setLoading(false)
       return
     }
-
-    fetchProductDetails()
-  }, [productId])
-
-  const fetchProductDetails = async () => {
     try {
       setLoading(true)
       const response = await fetch(`http://localhost:8000/product/${productId}`)
@@ -43,45 +38,13 @@ export default function ProductDetailPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [productId])
 
-  const getPriceChangeIcon = (changeType: string) => {
-    switch (changeType) {
-      case 'increase':
-        return (
-          <svg className="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17l9.2-9.2M17 17V7H7" />
-          </svg>
-        )
-      case 'decrease':
-        return (
-          <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 7l-9.2 9.2M7 7v10h10" />
-          </svg>
-        )
-      case 'initial':
-        return (
-          <svg className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-        )
-      default:
-        return (
-          <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-          </svg>
-        )
-    }
-  }
+  useEffect(() => {
+    fetchProductDetails()
+  }, [productId, fetchProductDetails])
 
-  const formatPriceChange = (entry: PriceHistoryEntry) => {
-    if (entry.change_type === 'initial') return 'Initial price'
-    if (entry.change_type === 'same') return 'No change'
-    if (entry.previous_price) {
-      return `From ${entry.previous_price}`
-    }
-    return entry.change_type || 'Unknown change'
-  }
+  // price change helpers removed (unused)
 
   const getTrendColor = (trend: string) => {
     switch (trend) {
@@ -125,7 +88,7 @@ export default function ProductDetailPage() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">Product Not Found</h2>
-            <p className="text-slate-400 mb-6">{error || 'The product you\'re looking for doesn\'t exist.'}</p>
+            <p className="text-slate-400 mb-6">{error || 'The product cannot be found.'}</p>
             <button 
               onClick={() => router.push('/')}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
@@ -246,8 +209,6 @@ export default function ProductDetailPage() {
         {/* Price Chart */}
         <PriceChart 
           priceHistory={product.price_history}
-          currentPrice={product.current_price}
-          productName={getProductName(product)}
         />
       </div>
     </div>

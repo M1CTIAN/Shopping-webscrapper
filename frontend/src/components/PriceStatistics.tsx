@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { ProductDetail } from '../types/product'
-import { extractNumericPrice, getBestPrices, getPriceTrend } from '../utils/priceUtils'
+import { extractNumericPrice, getBestPrices } from '../utils/priceUtils'
 
 interface PriceStatisticsProps {
   product: ProductDetail
@@ -25,8 +25,7 @@ export default function PriceStatistics({ product }: PriceStatisticsProps) {
     return null
   }
 
-  // Get trend analysis
-  const trend = getPriceTrend(priceHistory)
+  // Get trend analysis (not used directly in UI yet)
   
   // Calculate savings
   const firstPriceNum = priceHistory.length > 0 ? extractNumericPrice(priceHistory[0].price) : currentPriceNum

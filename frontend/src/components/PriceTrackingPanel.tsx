@@ -69,7 +69,7 @@ export default function PriceTrackingPanel() {
       } else {
         setMessage(`❌ Failed to update ${productId}: ${data.message}`)
       }
-    } catch (error) {
+    } catch {
       setMessage(`❌ Error updating ${productId}`)
     } finally {
       setUpdating(null)
@@ -90,7 +90,7 @@ export default function PriceTrackingPanel() {
       } else {
         setMessage(`❌ Failed to start batch update`)
       }
-    } catch (error) {
+    } catch {
       setMessage(`❌ Error starting batch update`)
     } finally {
       setLoading(false)
@@ -109,7 +109,7 @@ export default function PriceTrackingPanel() {
       setMessage(`✅ Updated ${data.updated_count} stale products, ${data.failed_count} failed`)
       fetchTrackingStatus()
       fetchStaleProducts()
-    } catch (error) {
+    } catch {
       setMessage(`❌ Error updating stale products`)
     } finally {
       setLoading(false)

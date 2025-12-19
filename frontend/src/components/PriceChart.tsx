@@ -2,7 +2,6 @@
 
 import React from 'react'
 import {
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -13,12 +12,9 @@ import {
   ReferenceLine
 } from 'recharts'
 import { PriceHistoryEntry } from '../types/product'
-import { formatDisplayPrice } from '../utils/priceUtils'
 
 interface PriceChartProps {
   priceHistory: PriceHistoryEntry[]
-  currentPrice: string
-  productName: string
 }
 
 interface ChartDataPoint {
@@ -30,9 +26,9 @@ interface ChartDataPoint {
   formattedDate: string
 }
 
-export default function PriceChart({ priceHistory, currentPrice, productName }: PriceChartProps) {
+export default function PriceChart({ priceHistory }: PriceChartProps) {
   // Convert price history to chart data
-  const chartData: ChartDataPoint[] = priceHistory.map((entry, index) => {
+  const chartData: ChartDataPoint[] = priceHistory.map((entry) => {
     // Extract numeric price from string (remove currency symbols, commas, etc.)
     const numericPrice = parseFloat(
       entry.price.replace(/[^\d.-]/g, '').replace(/,/g, '') || '0'
