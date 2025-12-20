@@ -32,9 +32,18 @@ app = FastAPI(
 )
 
 # Add CORS middleware for frontend
+# Configure CORS origins from environment for flexibility in deploys
+allowed_origins_env = os.environ.get("ALLOWED_ORIGINS")
+if allowed_origins_env:
+    # comma-separated list
+    allow_origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
+else:
+    # sensible defaults: local dev and (previously deployed) vercel frontend
+    allow_origins = ["http://localhost:3000", "https://shopping-webscrapper.vercel.app"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Next.js frontend
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

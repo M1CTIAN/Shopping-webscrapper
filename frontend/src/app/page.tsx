@@ -157,7 +157,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex flex-col md:flex-row gap-8 md:gap-12">
           {/* Sidebar */}
           <aside className="md:w-64 flex-shrink-0">
             <Sidebar 
