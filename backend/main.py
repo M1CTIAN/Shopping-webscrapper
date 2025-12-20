@@ -31,15 +31,10 @@ app = FastAPI(
     version=API_VERSION
 )
 
-# Add CORS middleware for frontend
-# Configure CORS origins from environment for flexibility in deploys
-allowed_origins_env = os.environ.get("ALLOWED_ORIGINS")
-if allowed_origins_env:
-    # comma-separated list
-    allow_origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
-else:
-    # sensible defaults: local dev and (previously deployed) vercel frontend
-    allow_origins = ["http://localhost:3000", "https://shopping-webscrapper.vercel.app"]
+allow_origins = [
+    "http://localhost:3000",  # For local testing
+    "https://shopping-webscrapper.vercel.app" # Your actual Vercel frontend
+]
 
 app.add_middleware(
     CORSMiddleware,
