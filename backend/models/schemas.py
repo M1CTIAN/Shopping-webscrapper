@@ -17,6 +17,12 @@ class ProductResponse(BaseModel):
     image_url: Optional[str] = None
     status: str
 
+class PriceHistoryEntry(BaseModel):
+    price: str
+    timestamp: str
+    change_type: Optional[str] = None
+    previous_price: Optional[str] = None
+
 class Product(BaseModel):
     id: int  # Unique numeric ID for routing
     product_id: str
@@ -27,17 +33,14 @@ class Product(BaseModel):
     current_price: str
     product_name: Optional[str] = None
     image_url: Optional[str] = None
+    total_checks: Optional[int] = None
+    price_changes: Optional[int] = None
+    price_history: Optional[List[PriceHistoryEntry]] = None
 
 class PriceHistory(BaseModel):
     product_id: str
     price: str
     timestamp: str
-
-class PriceHistoryEntry(BaseModel):
-    price: str
-    timestamp: str
-    change_type: Optional[str] = None
-    previous_price: Optional[str] = None
 
 class ProductsResponse(BaseModel):
     products: List[Product]
