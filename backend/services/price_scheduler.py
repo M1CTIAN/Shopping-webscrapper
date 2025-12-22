@@ -246,8 +246,8 @@ class PriceTrackingScheduler:
                 prices = []
                 for entry in price_history:
                     try:
-                        # Extract numeric price
-                        numeric_price = float(''.join(filter(str.isdigit, entry.get("price", "").replace('.', '').replace(',', ''))))
+                        # Extract numeric price from clean price string
+                        numeric_price = float(entry.get("price", "0"))
                         prices.append(numeric_price)
                     except:
                         continue

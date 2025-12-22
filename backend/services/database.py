@@ -125,8 +125,8 @@ class DatabaseService:
             # Determine change type
             change_type = "unknown"
             try:
-                old_numeric = float(''.join(filter(str.isdigit, old_price.replace('.', '').replace(',', ''))))
-                new_numeric = float(''.join(filter(str.isdigit, new_price.replace('.', '').replace(',', ''))))
+                old_numeric = float(old_price) if old_price.replace('.', '').isdigit() else 0
+                new_numeric = float(new_price) if new_price.replace('.', '').isdigit() else 0
                 
                 if new_numeric < old_numeric:
                     change_type = "decrease"

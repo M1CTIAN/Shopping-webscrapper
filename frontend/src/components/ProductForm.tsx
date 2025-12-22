@@ -33,7 +33,7 @@ export default function ProductForm({ onSubmit, loading }: ProductFormProps) {
             required
           />
           <p className="mt-2 text-sm text-gray-500">
-            Paste the URL of the product you want to track from Amazon, Flipkart, etc.
+            Paste the URL of the product you want to track from Amazon, Myntra, etc.
           </p>
         </div>
 

@@ -7,7 +7,7 @@ export default function HeroSection() {
         <span className="text-blue-500">Save Money.</span>
       </h1>
       <p className="mt-6 text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-        Never miss a price drop again. Monitor your favorite products from Amazon, Flipkart, and more with real-time alerts and history charts.
+        Never miss a price drop again. Monitor your favorite products from Amazon, Myntra, and more with real-time alerts and history charts.
       </p>
     </div>
   )

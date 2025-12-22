@@ -73,7 +73,7 @@ def add_product_tracking(product: ProductURL):
 
     # Validate that the URL corresponds to a supported e-commerce product
     website = detect_website(str(product.url))
-    allowed_prefixes = ('amazon_', 'flipkart_', 'myntra_')
+    allowed_prefixes = ('amazon_', 'myntra_')
     if not any(product_id.startswith(p) for p in allowed_prefixes):
         raise HTTPException(status_code=400, detail="Unsupported or non-product URL. Provide a valid product link from a supported site.")
     

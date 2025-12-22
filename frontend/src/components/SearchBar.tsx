@@ -52,10 +52,6 @@ export default function SearchBar() {
     const amazonAsin = /(?:\/dp\/|\/gp\/product\/)([a-z0-9]{10})/i
     if (u.includes('amazon') && amazonAsin.test(url)) return true
 
-    // Flipkart product
-    const flipkartMatch = /\/p\/(itm[a-z0-9]+)/i
-    if (u.includes('flipkart') && flipkartMatch.test(url)) return true
-
     // Myntra product (id/buy)
     const myntraMatch = /\/(\d+)\/buy/i
     if (u.includes('myntra') && myntraMatch.test(url)) return true
@@ -85,7 +81,7 @@ export default function SearchBar() {
     if (isUrl(query)) {
       // Validate it's a product link before attempting to track
       if (!isProductUrl(query)) {
-        setUrlError('Please paste a direct product link from Amazon, Flipkart or Myntra.')
+        setUrlError('Please paste a direct product link from Amazon or Myntra.')
         return
       }
       setUrlError('')

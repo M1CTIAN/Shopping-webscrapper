@@ -50,7 +50,6 @@ export const getProductName = (product: Product) => {
 export const getWebsiteName = (url: string) => {
   const domain = url.toLowerCase()
   if (domain.includes('amazon')) return 'Amazon'
-  if (domain.includes('flipkart')) return 'Flipkart'
   if (domain.includes('myntra')) return 'Myntra'
   return 'Store'
 }
@@ -58,7 +57,6 @@ export const getWebsiteName = (url: string) => {
 export const getWebsiteColor = (url: string) => {
   const domain = url.toLowerCase()
   if (domain.includes('amazon')) return 'bg-orange-100 text-orange-800'
-  if (domain.includes('flipkart')) return 'bg-yellow-100 text-yellow-800'
   if (domain.includes('myntra')) return 'bg-purple-100 text-purple-800'
   return 'bg-gray-100 text-gray-800'
 }

@@ -33,8 +33,6 @@ class PriceScraper:
             # Try site-specific scraping first
             if 'amazon' in url.lower():
                 result.update(self._scrape_amazon_data(soup))
-            elif 'flipkart' in url.lower():
-                result.update(self._scrape_flipkart_data(soup))
             elif 'myntra' in url.lower():
                 result.update(self._scrape_myntra_data(soup))
             else:
@@ -46,6 +44,9 @@ class PriceScraper:
                 price = self._scrape_price_with_regex(page_text)
                 if price:
                     result['price'] = price
+            
+            # Clean the price format
+            result['price'] = self._clean_price(result['price'])
             
             return result
             
@@ -133,73 +134,6 @@ class PriceScraper:
                     # Pattern: ._XY123_.jpg or ._XY123_XY123_.jpg
                     clean_src = re.sub(r'\._[A-Z]{2}\d+(?:_[A-Z]{2}\d+)?_?\.jpg$', '.jpg', img_src)
                     result['image_url'] = clean_src
-                    break
-        
-        return result
-    
-    def _scrape_flipkart_data(self, soup: BeautifulSoup) -> Dict[str, Any]:
-        """Extract price, name, and image from Flipkart page"""
-        result = {
-            'price': 'Price not found',
-            'name': 'Product',
-            'image_url': None
-        }
-        
-        # Price extraction
-        flipkart_price_selectors = [
-            '.Nx9bqj.CllCnN',  # New common selector
-            '.hZ3P6w.bnqy13',  # Found in debug
-            '._30jeq3._16Jk6d',
-            '._1_WHN1',
-            '._3I9_wc._2p6lqe',
-            '._25b18c'
-        ]
-        
-        for selector in flipkart_price_selectors:
-            price_elem = soup.select_one(selector)
-            if price_elem:
-                result['price'] = price_elem.get_text(strip=True)
-                break
-        
-        # Name extraction
-        name_selectors = [
-            '.CEn5rD',         # Found in debug
-            '.VU-ZEz',         # New common selector
-            '.B_NuCI',
-            '._35KyD6',
-            '.x2Jym8._35HD7C',
-            'h1._6EBuvT'
-        ]
-        
-        for selector in name_selectors:
-            name_elem = soup.select_one(selector)
-            if name_elem:
-                result['name'] = name_elem.get_text(strip=True)[:100]
-                break
-        
-        # Image extraction
-        image_selectors = [
-            'div.lWX0_T img',  # Main image container (New)
-            'img.UCc1lI',      # Main image class (New)
-            'img.EIfF82',      # Found in debug (Thumbnail - reliable)
-            'img.MZeksS',      # Found in debug (Main image - moved down due to false positives)
-            'img.I5YBTD',      # Found in debug
-            '.DByuf4 img',     # New common selector
-            '._396cs4._2amPTt._3qGmMb img',
-            '._2r_T1I img',
-            '.CXW8mj img',
-            '._396cs4 img'
-        ]
-        
-        for selector in image_selectors:
-            img_elem = soup.select_one(selector)
-            if img_elem:
-                img_src = img_elem.get('src') or img_elem.get('data-src')
-                if img_src and 'http' in img_src:
-                    # Flipkart images often have /image/128/128/ in the path
-                    # We can replace it with /image/832/832/ for higher resolution
-                    high_res_src = re.sub(r'/image/\d+/\d+/', '/image/832/832/', img_src)
-                    result['image_url'] = high_res_src
                     break
         
         return result
@@ -425,6 +359,23 @@ class PriceScraper:
             if matches:
                 return matches[0]
         return None
+    
+    def _clean_price(self, price: str) -> str:
+        """Clean price string to remove currency symbols and format consistently"""
+        if not price or price in ['Price not found', 'Request error', 'Scraping error']:
+            return price
+        # Remove currency symbols and keep only digits, dots, and commas
+        cleaned = re.sub(r'[^\d.,]', '', price)
+        # Remove commas and extra dots, keep only the last dot for decimals
+        parts = cleaned.replace(',', '').split('.')
+        if len(parts) > 1:
+            # Reconstruct with only one dot
+            cleaned = ''.join(parts[:-1]) + '.' + parts[-1]
+        else:
+            cleaned = ''.join(parts)
+        # Remove trailing dots
+        cleaned = cleaned.rstrip('.')
+        return cleaned if cleaned else 'Price not found'
 
     def close(self):
         """Close the session"""

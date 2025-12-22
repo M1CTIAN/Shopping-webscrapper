@@ -18,6 +18,7 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<ProductDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [updatingPrice, setUpdatingPrice] = useState(false)
 
   const fetchProductDetails = useCallback(async () => {
     if (!productId) {
@@ -45,6 +46,29 @@ export default function ProductDetailPage() {
   useEffect(() => {
     fetchProductDetails()
   }, [productId, fetchProductDetails])
+
+  const updateProductPrice = async () => {
+    if (!productId) return
+    
+    try {
+      setUpdatingPrice(true)
+      const response = await fetch(`${API_BASE}/track/update/${productId}`, {
+        method: 'POST',
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to update price')
+      }
+
+      // Refresh product details after update
+      await fetchProductDetails()
+    } catch (err) {
+      console.error('Error updating price:', err)
+      // Could add a toast notification here
+    } finally {
+      setUpdatingPrice(false)
+    }
+  }
 
   // price change helpers removed (unused)
 
@@ -179,8 +203,22 @@ export default function ProductDetailPage() {
                 >
                   View on {getWebsiteName(product.clean_url)}
                 </a>
-                <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
-                  Track Price
+                <button 
+                  onClick={updateProductPrice}
+                  disabled={updatingPrice}
+                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:bg-green-800 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
+                >
+                  {updatingPrice ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Updating...
+                    </>
+                  ) : (
+                    'Update Price'
+                  )}
                 </button>
               </div>
 
